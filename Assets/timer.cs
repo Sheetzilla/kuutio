@@ -1,5 +1,7 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public class timer : MonoBehaviour
 {
@@ -12,6 +14,21 @@ public class timer : MonoBehaviour
     private ScriptKuutio cube;
     private GameManager gameManager;
     public GameObject Button;
+
+    public float timerVolume = 1f;
+
+    public float brrInterval = 0.2f;
+
+    [SerializeField]
+    private AudioClip Brr;
+
+    // Repeat controls (default to 20 as requested)
+    public int brrRepeat = 20;
+    public float brrGap = 0f; // extra gap between repeats in seconds
+
+    private Coroutine brrRoutine;
+    public bool IsBeeping { get; private set; }
+
     void Start()
     {
         cube = GetComponent<ScriptKuutio>();
@@ -39,6 +56,10 @@ public class timer : MonoBehaviour
             timerIsRunning = false;
             inputField.text = "00:00";
 
+            // Start beeping: will play up to brrRepeat times (default 20)
+            Debug.Log("timer: starting beeping sequence.");
+            StartBeeping();
+
             gameManager.StopDropTimer();
             gameManager.DropAllCubes();
             cube.isSpinning = false;
@@ -47,6 +68,72 @@ public class timer : MonoBehaviour
             Button.SetActive(false);
             timeLimit = 0;
         }
+    }
+
+    // Starts the repeated Brr playback. Playback stops automatically after
+    // brrRepeat plays or earlier if StopBeeping() is called (e.g. main cube pressed).
+    public void StartBeeping()
+    {
+        if (IsBeeping)
+        {
+            Debug.Log("timer: already beeping.");
+            return;
+        }
+
+        if (brrRoutine != null)
+            StopCoroutine(brrRoutine);
+
+        
+        IsBeeping = true;
+        brrRoutine = StartCoroutine(PlayBrrRepeated());
+    }
+
+    // Stops the repeated playback immediately.
+    public void StopBeeping()
+    {
+        Debug.Log("timer: StopBeeping called.");
+        if (brrRoutine != null)
+        {
+            StopCoroutine(brrRoutine);
+            brrRoutine = null;
+        }
+        IsBeeping = false;
+    }
+
+    private IEnumerator PlayBrrRepeated()
+    {
+        if (audioManager.instance == null)
+        {
+            Debug.LogWarning("timer: audioManager.instance is null; cannot play Brr.");
+            IsBeeping = false;
+            yield break;
+        }
+
+        if (Brr == null)
+        {
+            Debug.LogWarning("timer: Brr AudioClip is not assigned on the timer component.");
+            IsBeeping = false;
+            yield break;
+        }
+
+        int times = Mathf.Max(1, brrRepeat);
+        Debug.Log($"timer: PlayBrrRepeated starting - will attempt {times} plays, clip='{Brr.name}', length={Brr.length}s, gap={brrGap}s");
+
+        for (int i = 0; i < times; i++)
+        {
+            if (!IsBeeping) // allow external stop
+                break;
+
+            Debug.Log($"timer: playing Brr iteration {i+1}/{times}");
+            audioManager.instance.PlayAudio(Brr, this.transform, volume: timerVolume);
+
+            // when next beep sound starts
+            yield return new WaitForSeconds(brrInterval);
+        }
+
+        Debug.Log("timer: PlayBrrRepeated finished.");
+        brrRoutine = null;
+        IsBeeping = false;
     }
 
     // Parses "MM:SS" into total seconds. Returns false if the field is empty/invalid.

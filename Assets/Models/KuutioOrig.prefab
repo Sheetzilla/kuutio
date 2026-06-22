@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -5291716728754002013}
   - component: {fileID: 602489882131939228}
   m_Layer: 6
-  m_Name: Kuutio
+  m_Name: KuutioOrig
   m_TagString: Kuutio
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -69,7 +69,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8dd7d448f0e549541be8cd5eb7181f26, type: 2}
+  - {fileID: 2100000, guid: 67f9cd46412a8a34aae295ecb98863e2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -151,7 +151,7 @@ Animator:
   m_GameObject: {fileID: 8153980062216104163}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 4fffe74d0e5eb42488c98c42534db36b, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

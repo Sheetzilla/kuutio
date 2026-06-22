@@ -64,6 +64,7 @@
     <Compile Include="Assets\TimeInputFilter.cs" />
     <Compile Include="Assets\PassCheck.cs" />
     <Compile Include="Assets\timer.cs" />
+    <Compile Include="Assets\audioManager.cs" />
     <Compile Include="Assets\Models\ScriptKuutio.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\GameManager.cs" />

@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour
     public int spawnAmount = 10;
     public int spawned = 0;
     public List<GameObject> cubes = new List<GameObject>();
+    [SerializeField]
+    private AudioClip Blop2;
+    public float blopVolume = 1f;
+
 
     // World Y below which a dropped cube is destroyed. Set this in the Inspector
     // to a height comfortably below the bottom of the visible play area.
@@ -47,12 +51,27 @@ public class GameManager : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
+                // If the main cube is clicked after the timer ran out and the timer is beeping,
+                // stop the beeping and trigger the click animation â€” don't spawn minis.
+                if (hit.collider.gameObject.CompareTag("Kuutio") &&
+                    timerScript != null &&
+                    timerScript.timeLimit <= 0 &&
+                    timerScript.IsBeeping)
+                {
+                    timerScript.StopBeeping();
+                    hit.collider.gameObject.GetComponent<Animator>()?.SetTrigger("click");
+                    return;
+                }
+
                 if (hit.collider.gameObject.CompareTag("Kuutio") &&
                     spawned < 300 &&
                     timerScript.timeLimit > 0 &&
                     !cube.isSpinning)
-                    
                 {
+                    // Play click sound
+                    if (audioManager.instance != null && Blop2 != null)
+                        audioManager.instance.PlayAudio(Blop2, hit.collider.gameObject.transform, 0.5f);
+
                     StartCoroutine(spawnMinis(hit));
                     hit.collider.gameObject.GetComponent<Animator>().SetTrigger("click");
                 }
@@ -72,11 +91,15 @@ public class GameManager : MonoBehaviour
                 Random.Range(-0.3f, 0.3f),
                 Random.Range(-0.3f, 0.3f),
                 0f);
+
+            //Pikkuset spwan
+
             GameObject spawnattu = Instantiate(
                 pikku,
                 hit.collider.gameObject.transform.position + jitter,
                 Quaternion.identity);
 
+            // NOTE: sound is played once on click in Update; avoid creating sound for each spawned mini
             Rigidbody rb = spawnattu.GetComponent<Rigidbody>();
             if (rb != null)
             {
@@ -124,7 +147,7 @@ public class GameManager : MonoBehaviour
 
         float percentRemaining = timerScript.timeRemaining / timerScript.timeLimit;
         // Target keep-count is a fraction of the ORIGINAL pile, not the current
-        // (shrinking) one — otherwise the percentage compounds each second and the
+        // (shrinking) one ï¿½ otherwise the percentage compounds each second and the
         // pile collapses far too fast (e.g. half gone in the first ~50s).
         int cubesToKeep = Mathf.RoundToInt(startingCubeCount * percentRemaining);
 
@@ -161,7 +184,7 @@ public class GameManager : MonoBehaviour
 
         // Wait until the cube falls below the despawnY world height, then destroy
         // it. Using a fixed Y line (instead of the camera viewport) means cubes
-        // squeezed off sideways or sitting above the top are never culled early —
+        // squeezed off sideways or sitting above the top are never culled early ï¿½
         // a cube is only removed once it has genuinely dropped out the bottom.
         // A safety timeout still cleans up anything that somehow never falls.
         float timeout = 20f;

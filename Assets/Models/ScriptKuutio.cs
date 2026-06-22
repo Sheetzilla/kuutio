@@ -7,6 +7,7 @@ public class ScriptKuutio : MonoBehaviour
     public GameObject spawnattuKuutio;
     public Vector3 direction = new Vector3(0, 0, 0);
     public float spinSpeed;
+    public bool spinSpeedIsDegrees = false; // set to true if spinSpeed is degrees/sec in the Inspector
     public bool isSpinning = true;
     public TextMeshProUGUI buttonText;
 
@@ -27,15 +28,22 @@ public class ScriptKuutio : MonoBehaviour
         isSpinning = false;
     }
 
-    void Update()
+    // Use FixedUpdate for physics changes
+    void FixedUpdate()
     {
         if (spawnRb == null)
             return;
 
         if (isSpinning)
-            spawnRb.angularVelocity = new Vector3(spinSpeed, 0, 0);
+        {
+            float angular = spinSpeedIsDegrees ? spinSpeed * Mathf.Deg2Rad : spinSpeed;
+            // Negative Y for clockwise rotation (as seen from above) using right-hand rule
+            spawnRb.angularVelocity = new Vector3(0f, -angular, 0f);
+        }
         else
+        {
             spawnRb.angularVelocity = Vector3.zero;
+        }
     }
 
     public void SetSpin()
