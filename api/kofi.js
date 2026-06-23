@@ -34,7 +34,7 @@ export default async function handler(req, res) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      sender: { name: 'FishTimer', email: 'sleetsheet.st@gmail.com' },
+      sender: { name: 'FishTimer', email: 'sheet@sleetsheet.com' },
       to: [{ email: data.email }],
       subject: 'Your FishTimer license key',
       htmlContent: `
