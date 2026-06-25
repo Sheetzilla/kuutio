@@ -19,3 +19,6 @@
 
 /Build/*.loader.js
   Content-Type: application/javascript
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob:; connect-src 'self' https://shopkofi.sleetsheet-st.workers.dev; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline';
